@@ -2,4 +2,29 @@ current version is beta 1.5_01
 
 Requires ModLoader
 
-A Redstone-Inverter acting as a NOT gate.
+a Redstone Inverter acting as a NOR gate (I = Inverter)
+
+  o
+  |
+b-I-c
+  |
+  a
+
+o = !(a or b or c)
+
+
+b & c only react if redstone is facing directly IN
+a reacts on parallel too:
+
+  |
+  I
+x---
+ 
+x will trigger gate in this way (R = Repeater acting as diode to hide output)
+
+ R|
+ |I
+ |
+ x
+
+x does not trigger gate
