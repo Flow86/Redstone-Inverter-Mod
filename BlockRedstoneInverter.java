@@ -75,7 +75,7 @@ public class BlockRedstoneInverter extends Block
 	public void updateTick(World world, int i, int j, int k, Random random)
 	{
 		int l = world.getBlockMetadata(i, j, k);
-		boolean flag = isBlockGettingPowerFrom(world, i, j, k, l);
+		boolean flag = isBlockGettingPowerFromNOR(world, i, j, k, l);
 		
 		if(inverterIsPowered && !flag)
 		{
@@ -127,7 +127,8 @@ public class BlockRedstoneInverter extends Block
 		}
 		
 		int i1 = world.getBlockMetadata(i, j, k);
-		boolean flag = isBlockGettingPowerFrom(world, i, j, k, i1);
+		boolean flag = isBlockGettingPowerFromNOR(world, i, j, k, i1);
+
 		int j1 = (i1 & 0xc) >> 2;
 
 		if(inverterIsPowered && !flag)
@@ -135,6 +136,30 @@ public class BlockRedstoneInverter extends Block
 		else if(!inverterIsPowered && flag)
 			world.scheduleBlockUpdate(i, j, k, blockID, field_22023_b[j1] * 2);
 	}
+
+	private boolean isBlockGettingPowerFromNOR(World world, int i, int j, int k, int l)
+	{
+		boolean flag = isBlockGettingPowerFrom(world, i, j, k, l);
+		
+		// nor gate
+		switch(l)
+		{
+		case 0: // '\0'   von hinten & li, re
+		case 2: // '\002' von vorne  & li, re
+			flag = flag || world.isBlockIndirectlyProvidingPowerTo(i + 1, j, k, 5) ||
+			               world.isBlockIndirectlyProvidingPowerTo(i - 1, j, k, 4);
+			break;
+
+		case 1: // '\001' von li & vorne, hinten
+		case 3: // '\003' von re & vorne, hinten
+			flag = flag || world.isBlockIndirectlyProvidingPowerTo(i, j, k + 1, 3) ||
+			               world.isBlockIndirectlyProvidingPowerTo(i, j, k - 1, 2);
+			break;
+		}
+		
+		return flag;
+	}
+
 
 	private boolean isBlockGettingPowerFrom(World world, int i, int j, int k, int l)
 	{
@@ -176,7 +201,7 @@ public class BlockRedstoneInverter extends Block
 	{
 		int l = ((MathHelper.floor_double((double)((entityliving.rotationYaw * 4F) / 360F) + 0.5D) & 3) + 2) % 4;
 		world.setBlockMetadataWithNotify(i, j, k, l);
-		boolean flag = isBlockGettingPowerFrom(world, i, j, k, l);
+		boolean flag = isBlockGettingPowerFromNOR(world, i, j, k, l);
 		if(flag)
 			world.scheduleBlockUpdate(i, j, k, blockID, 1);
 	}
