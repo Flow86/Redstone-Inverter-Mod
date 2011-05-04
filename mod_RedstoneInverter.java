@@ -135,8 +135,6 @@ public class mod_RedstoneInverter extends BaseMod
 		renderBlocks = renderblocks;
 		blockAccess = iblockaccess;
 		
-		System.out.printf("RenderWorldBlock\n");
-		
 		if(l == redstoneInverterModelID)
 			return  renderBlockRedstoneInverter(block, i, j, k);
 

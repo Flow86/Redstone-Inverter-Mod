@@ -16,14 +16,11 @@ public class BlockRedstoneInverter extends Block
 
 	public boolean renderAsNormalBlock()
 	{
-		System.out.printf("renderAsNormalBlock\n");
 		return false;
 	}
 
 	public boolean canPlaceBlockAt(World world, int i, int j, int k)
 	{
-		System.out.printf("canPlaceBlockAt %d/%d/%d\n", i, j, k);
-
 		if(!world.isBlockOpaqueCube(i, j - 1, k))
 			return false;
 		
@@ -32,8 +29,6 @@ public class BlockRedstoneInverter extends Block
 
 	public boolean canBlockStay(World world, int i, int j, int k)
 	{
-		System.out.printf("canBlockStay %d/%d/%d\n", i, j, k);
-
 		if(!world.isBlockOpaqueCube(i, j - 1, k))
 			return false;
 		
@@ -42,14 +37,12 @@ public class BlockRedstoneInverter extends Block
 
 	public int getBlockTextureFromSideAndMetadata(int i, int j)
 	{
-		System.out.printf("getBlockTextureFromSideAndMetadata %d/%d\n", i, j);
 		if(i == 0)
 			return inverterIsPowered ? 115 : 99; // torch on : off
 
 		if(i == 1)
 		{
 			int j1 = (j & 0xc) >> 2;
-			System.out.printf("j1: %d\n", j1);
 			switch(field_22023_b[j1])
 			{
 			case 1: return (!inverterIsPowered ? 131 : 147); // top off : on
@@ -64,7 +57,6 @@ public class BlockRedstoneInverter extends Block
 
 	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, int i, int j, int k, int l)
 	{
-		//System.out.printf("shouldSideBeRendered %d/%d/%d/%d\n", i, j, k, l);
 		return l != 0 && l != 1;
 	}
 
@@ -75,71 +67,49 @@ public class BlockRedstoneInverter extends Block
 
 	public int getBlockTextureFromSide(int i)
 	{
-		//System.out.printf("getBlockTextureFromSide %d\n", i);
 		return getBlockTextureFromSideAndMetadata(i, 0);
 	}
 
 	public void updateTick(World world, int i, int j, int k, Random random)
 	{
-		System.out.printf("updateTick %d/%d/%d\n", i, j, k);
-		
 		int l = world.getBlockMetadata(i, j, k);
 		boolean flag = isBlockGettingPowerFrom(world, i, j, k, l);
 		int j1 = (l & 0xc) >> 2;
-
-		System.out.printf("inverterIsPowered: %s\n", inverterIsPowered ? "on" : "off");
-		System.out.printf("flag: %s\n", flag ? "on" : "off");
 
 		boolean change = ((inverterIsPowered && !flag) || (!inverterIsPowered && flag));
 		
 		inverterIsPowered = flag;
 		
 		if(change)
-		{
-			System.out.printf("changed\n");
 			world.setBlockMetadataWithNotify(i, j, k, l);
-		}
 	}
 
 	public boolean isIndirectlyPoweringTo(World world, int i, int j, int k, int l)
 	{
-		System.out.printf("isIndirectlyPoweringTo %d/%d/%d/%d\n", i, j, k, l);
-
 		return isPoweringTo(world, i, j, k, l);
 	}
 
 	public boolean isPoweringTo(IBlockAccess iblockaccess, int i, int j, int k, int l)
 	{
-		System.out.printf("isPoweringTo %d/%d/%d/%d\n", i, j, k, l );
-		System.out.printf("inverterIsPowered: %s\n", inverterIsPowered ? "on" : "off");
-
 		if(inverterIsPowered)
 			return false;
 			
 		int i1 = iblockaccess.getBlockMetadata(i, j, k) & 3;
-		System.out.printf("i1: %d\n", i1);
+		
 		if(i1 == 0 && l == 3)
-		{
 			return true;
-		}
 		if(i1 == 1 && l == 4)
-		{
 			return true;
-		}
 		if(i1 == 2 && l == 2)
-		{
 			return true;
-		}
+
 		return i1 == 3 && l == 5;
 	}
 
 	public void onNeighborBlockChange(World world, int i, int j, int k, int l)
 	{
-		System.out.printf("onNeighborBlockChange %d/%d/%d/%d\n", i, j, k, l);
-
 		if(!canBlockStay(world, i, j, k))
 		{
-			System.out.printf("drop: %d/%d/%d %d", i, j, k, world.getBlockMetadata(i, j, k));
 			dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k));
 			world.setBlockWithNotify(i, j, k, 0);
 			return;
@@ -177,8 +147,6 @@ public class BlockRedstoneInverter extends Block
 
 	public boolean blockActivated(World world, int i, int j, int k, EntityPlayer entityplayer)
 	{
-		System.out.printf("blockActivated %d/%d/%d\n", i, j, k);
-
 		int l = world.getBlockMetadata(i, j, k);
 		int i1 = (l & 0xc) >> 2;
 		i1 = i1 + 1 << 2 & 0xc;
@@ -188,13 +156,11 @@ public class BlockRedstoneInverter extends Block
 
 	public boolean canProvidePower()
 	{
-		//System.out.printf("canProvidePower\n");
 		return false;
 	}
 
 	public void onBlockPlacedBy(World world, int i, int j, int k, EntityLiving entityliving)
 	{
-
 		int l = ((MathHelper.floor_double((double)((entityliving.rotationYaw * 4F) / 360F) + 0.5D) & 3) + 2) % 4;
 		world.setBlockMetadataWithNotify(i, j, k, l);
 		boolean flag = isBlockGettingPowerFrom(world, i, j, k, l);
