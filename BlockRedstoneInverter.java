@@ -7,9 +7,11 @@ import java.util.Random;
 
 public class BlockRedstoneInverter extends Block
 {
-	protected BlockRedstoneInverter(int i)
+	protected BlockRedstoneInverter(int i, boolean flag)
 	{
 		super(i, Material.circuits);
+		
+		inverterIsPowered = flag;
 		
 		setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.125F, 1.0F);
 	}
@@ -74,14 +76,20 @@ public class BlockRedstoneInverter extends Block
 	{
 		int l = world.getBlockMetadata(i, j, k);
 		boolean flag = isBlockGettingPowerFrom(world, i, j, k, l);
-		int j1 = (l & 0xc) >> 2;
-
-		boolean change = ((inverterIsPowered && !flag) || (!inverterIsPowered && flag));
 		
-		inverterIsPowered = flag;
-		
-		if(change)
-			world.setBlockMetadataWithNotify(i, j, k, l);
+		if(inverterIsPowered && !flag)
+		{
+			world.setBlockAndMetadataWithNotify(i, j, k, mod_RedstoneInverter.redstoneInverter.blockID, l);
+		} else
+		if(!inverterIsPowered)
+		{
+			world.setBlockAndMetadataWithNotify(i, j, k, mod_RedstoneInverter.redstoneInverterA.blockID, l);
+			if(!flag)
+			{
+				int i1 = (l & 0xc) >> 2;
+				world.scheduleBlockUpdate(i, j, k, mod_RedstoneInverter.redstoneInverterA.blockID, field_22023_b[i1] * 2);
+			}
+		}
 	}
 
 	public boolean isIndirectlyPoweringTo(World world, int i, int j, int k, int l)
@@ -95,6 +103,9 @@ public class BlockRedstoneInverter extends Block
 			return false;
 			
 		int i1 = iblockaccess.getBlockMetadata(i, j, k) & 3;
+		
+		if(l == 1)
+			return true;
 		
 		if(i1 == 0 && l == 3)
 			return true;
@@ -127,21 +138,23 @@ public class BlockRedstoneInverter extends Block
 
 	private boolean isBlockGettingPowerFrom(World world, int i, int j, int k, int l)
 	{
-		int i1 = l & 3;
-		switch(i1)
+		int l1 = l & 3;
+
+		switch(l1)
 		{
 		case 0: // '\0'
-			return world.isBlockIndirectlyProvidingPowerTo(i, j, k + 1, 3);
+			return world.isBlockIndirectlyProvidingPowerTo(i, j, k + 1, 1) || world.isBlockIndirectlyProvidingPowerTo(i, j, k + 1, 3);
 
 		case 2: // '\002'
-			return world.isBlockIndirectlyProvidingPowerTo(i, j, k - 1, 2);
+			return world.isBlockIndirectlyProvidingPowerTo(i, j, k - 1, 1) || world.isBlockIndirectlyProvidingPowerTo(i, j, k - 1, 2);
 
 		case 3: // '\003'
-			return world.isBlockIndirectlyProvidingPowerTo(i + 1, j, k, 5);
+			return world.isBlockIndirectlyProvidingPowerTo(i + 1, j, k, 1) || world.isBlockIndirectlyProvidingPowerTo(i + 1, j, k, 5);
 
 		case 1: // '\001'
-			return world.isBlockIndirectlyProvidingPowerTo(i - 1, j, k, 4);
+			return world.isBlockIndirectlyProvidingPowerTo(i - 1, j, k, 1) || world.isBlockIndirectlyProvidingPowerTo(i - 1, j, k, 4);
 		}
+		
 		return false;
 	}
 
@@ -156,7 +169,7 @@ public class BlockRedstoneInverter extends Block
 
 	public boolean canProvidePower()
 	{
-		return false;
+		return inverterIsPowered;
 	}
 
 	public void onBlockPlacedBy(World world, int i, int j, int k, EntityLiving entityliving)
@@ -230,6 +243,6 @@ public class BlockRedstoneInverter extends Block
 	private static final int field_22023_b[] = {
 		1, 2, 3, 4
 	};
-	private boolean inverterIsPowered = false;
+	private final boolean inverterIsPowered;
 
 }

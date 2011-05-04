@@ -6,8 +6,10 @@ public class mod_RedstoneInverter extends BaseMod
 {
 	public static Item redstoneInverterItem;
 	public static Block redstoneInverter;
+	public static Block redstoneInverterA;
 	public static int redstoneInverterModelID;
 	public static int redstoneInverterID = 120;
+	public static int redstoneInverterAID = 121;
 	public static int redstoneInverterItemID = 1200;
 	
 	public static int[] redstoneInverterTerrain = new int[4];
@@ -17,7 +19,8 @@ public class mod_RedstoneInverter extends BaseMod
 	
 	public mod_RedstoneInverter()
 	{
-		redstoneInverter = new BlockRedstoneInverter(redstoneInverterID).setBlockName("not gate");
+		redstoneInverter = new BlockRedstoneInverter(redstoneInverterID, false).setBlockName("not gate");
+		redstoneInverterA = new BlockRedstoneInverter(redstoneInverterAID, true).setBlockName("active not gate");
 
 		redstoneInverterTerrain[0] = ModLoader.addOverride("/terrain.png", "/mods/Flow86/redstoneinverter_1a.png");
 		redstoneInverterTerrain[1] = ModLoader.addOverride("/terrain.png", "/mods/Flow86/redstoneinverter_2a.png");
@@ -27,8 +30,9 @@ public class mod_RedstoneInverter extends BaseMod
 		int id = ModLoader.addOverride("/gui/items.png", "/mods/Flow86/gui/redstoneinverter.png");
 		redstoneInverterItem = new ItemReed(redstoneInverterItemID, redstoneInverter).setIconIndex(id).setItemName("Redstone Inverter Item");
 
-		ModLoader.AddName(redstoneInverter,   "Redstone Inverter");
-		ModLoader.AddName(redstoneInverterItem,   "Redstone Inverter");
+		ModLoader.AddName(redstoneInverter,     "Redstone Inverter");
+		ModLoader.AddName(redstoneInverterA,    "Redstone Inverter");
+		ModLoader.AddName(redstoneInverterItem, "Redstone Inverter");
 
 		ModLoader.RegisterBlock(redstoneInverter);
 
